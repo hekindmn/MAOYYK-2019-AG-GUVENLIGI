@@ -1,0 +1,558 @@
+----------------------------------
+HACKER
+MOTIVASYON :
+
+-PARA
+-ÜN , ŞÖHRET
+-AKTIVIZM
+-DEVLET DESTEKLI
+-EGO , KİŞİSEL TATMİN
+-------------------------------------
+
+
+
+**********OSI***************
+------UYGULAMA KATMANI------
+APPLICATION - INTERAKSIYON - 
+PRESENTATION - FORMAT DEGISTIRME - HTTP VIDEO VB 
+SESSION - OTURUM DOĞRULAMA - FARKLI SİSTEMLER - FTP HTTP
+-----UYGULAMA KATMANI--------
+TRANSPORTATION - NAKIL PROTOKOLU - TCP UDP - PORT
+NETWORK - ADRESLEME - IPV 4-6 ICMP4-6 - IP ADRESI
+DATA LINK - DIGITAL - ETHERNET - 802.11 802.15 - PPP - ARP 
+PHYSICAL - ANALOG - CAT5 CAT6 - KABLO
+***********OSI**************
+
+-------------------------------
+FARKLI CİHAZ - DÜZ (SWITCH-PC)
+AYNI CİHAZ - TERS (PC-PC)
+-------------------------------
+
+
+
+******    ARP   *******
+IP ADRESINDEN MAC ÇÖZÜMLER
+
+AYNI AĞDA IPSİ BİLİNEN BİR CİHAZIN MAC ADRESİ ÇÖZÜLÜR - FİZİKİ LOKASYON
+(SESLENMEK)
+WHO HAS (IP) TELL (IP)
+ARP REQUEST BROADCAST -> HERKESE GİDEN YAYIN
+ARP REPLY   UNICAST   -> TEK CEVAP
+
+arp -d [IP]
+ping [IP]
+
+birbirlerini bağımsız çözerler!!! - iki tarafta birbirine sorar !
+pakete cevap vermek için
+-----ping-----
+ADRES ÇÖZ
+ICMP ECHO AT
+-----ping-----
+
+MAC ADRESİ -> DONANIMSAL ADRES , FABRİKA ÇIKIŞI , FİZİKSEL !!
+48 BİT , 16LIK DÜZEN , 2ŞER 
+11:22:33:44:55:66:77
+
+AĞ TRAFİĞİ İZLEME
+WIRESHARK - GRAFIK ARAYÜZ
+TCPDUMP - TERMINAL
+
+ARP -> Doğrulama mekanizması yok
+******        ARP      *********
+
+
+
+******INTERNET PROTOCOL*********
+32 bit
+4 oktet
+8bit x 4
+
+128+64+32+16+4+2+1
+8 bit + 8bit +8bit +8bit
+11000000 . 10101000 . 00000000 . 00000001 = 192.168.0.1
+
+SUBNET MASK = YÖNETİM 
+
+1111111 . 1111111 . 1111111 . 00000000 = 255.255.255.0
+255.255.255.255 = IPv4 Broadcast = Herkese gider 
+
+*192.168.1.0*
+*255.255.254.0*
+
+Kaç tane 1 var ? /
+Hepsi 1 = /32
+
+En az 2 pc haberleşme subnet mask /30
+255.255.255.252
+1 GW
+1 BROADCAST
+2 PC
+
+S : 1 ICMP ECHO 2 CEVAP TEK ADRES ?
+C : 1.2 CIHAZI BURDAYIM DIYOR , BROADCAST UZERINDEN CEVAP VERIYOR
+1.2 1.0 IN MAKINE OLDUGUNU ANLAMIYOR , NETWORK ID SANIP DEVAM EDIYOR
+
+1.1.1.1
+2.2.2.2
+
+"route -n"
+"route add -net 2.2.2.0/25 dev eth0"
+
+"GATEWAY"
+
+Subnet yeterli değil
+ROUTING -> YÖNLENDIRME
+
+BROADCAST -> <- UNICAST
+
+ARP DOĞRULAMA MEVCUT DEĞİL
+
+Tool : scapy - python library
+Network paketi oluşturma , elle müdahale etme
+
+" (python)
+
+import scapy.all import *
+
+ls()
+ls(ARP)
+
+
+
+opcode 1 request -> DEFAULT
+opcode 2 response -> ARP REPLY 
+
+FF:FF:FF:FF:FF:FF:FF -> Broadcast
+
+0-> IP
+1-> Broadcast
+
+"arpbaslik = ARP(hwsrc="MAC" , psrc="IP" hwdst="MAC2" pdst="IP2" op="2")
+
+ls(arpbaslik)
+
+ls(Ether)
+etherbaslik = Ether(dst="FF" , src="SRC")
+ls(etherbaslik)
+
+sendp(etherbaslik/arpbaslik , loop=1 )
+paket = etherbaslik/arpbaslik 
+
+"
+
+ARP ALTERING
+= MAC FLOOD = DOS
+= MITM = ARP SPOOF
+
+
+ARP REQUEST -> KIM ?
+ARP REPLY -> GW BENIM ,  0 DAN KAYIT ACILMAZ , VAROLAN GÜNCELLENİR(!)
+
+
+
+bypass = 1 req , reply
+
+"en son atılanda kalır"
+
+Dışarıdan yöntem-hedef -> ARP POISON
+
+
+
+2^32 - 2 = 4b maks IP Adresi
+
+
+IANA
+
+IP CLASS
+A 0-126   -> 
+B 128-191 ->
+C 192-223 ->
+D 224-240 -> MULTICAST
+E 241-255 -> REZERVE
+
+PUBLIC - PRIVATE IP
+
+PRIVATE     -> 10.0.0.0/8 | 172.16.0.0/12 | 192.168.0.0/16
+127.0.0.1/8 -> LOCAL LOOPBACK - Interface "lo
+APIPA -> 169.254.0.0/10 -> Default çıkamaz , Gateway atamaz , PC kendi içinde atar
+ 
+
+NETWORK ADRESS TRANSLATION
+Private -> Router -> Public -> INTERNET
+
+A = 192.168.0.1 => PAKET SRC:192.168.0.1 DST:8.8.8.8 
+=> ROUTER(2.2.2.2) => PAKET SRC:2.2.2.2 DST : 8.8.8.8
+=> ROUTER(8.8.8.8) => PAKET SRC:2.2.2.2 DST : 10.0.0.1
+B = 10.0.0.1 PAKET SRC:2.2.2.2 DST : 10.0.0.1
+B PAKETİ ALDI
+
+SNAT = SOURCE NAT
+DNAT = DESTINATION NAT
+
+
+/ network id = kucuk buyuk
+
+*IP ADRESI NASIL ALINIR*
+IANA
+RIPE
+
+ASN = Autonom System Number
+
+BORDER GATEWAY PROTOCOL
+
+GUVENLIK DUVARI = KURALLARA GÖRE GEÇSİN Mİ GEÇMESİN Mİ ? PRIMITIF
+NEXTGEN = ÇÖZÜM BİRLEŞTİRME
+
+"encapsulation"
+
+
+*******INTERNET PROTOCOL*********
+
+
+
+********   ROUTING   ***********
+!!!ROUTING ÇALIŞ!!!
+********   ROUTING   ***********
+
+
+*****NETWORK ADRESS TRANSLATION*****
+Private -> Router -> Public -> INTERNET
+	  "MAC TABLE"
+
+*Son mac son router'ın !!
+
+***NETWORK ADRESS TRANSLATION*****
+
+
+PCA 2.2.2.2/30   GW       SERVER 1.1.1.1/30
+
+
+Windows statik ip = GUI 2.2.2.2 sm = 255.255.255.252 gw 2.2.2.1
+Linux statik ip = ifconfig eth0 2.2.2.1 netmask 255.255.255.252 - /30
+Server = ifconfig eth1 1.1.1.1 netmask 255.255.255.252 - /30 
+
+route add -net (0.0.0.0/30) default gw (gw) eth0
+
+******NAT/ROUTING*******
+
+
+DNS POISONING
+
+netwox105
+dnsmasq -C
+
+REVERSE DNS
+PTR
+
+IPDEN HOST BULUR
+dig -x -> reverse DNS
+
+
+CLOUDFLARE -> ÜRÜN BİZİZ
+DDOS
+IP GIZLEME
+
+REVERSE PROXY
+1. YÜK DENGELEME (LOAD BALANCE)
+2. ERİŞEBİLİRLİK
+
+
+NORMAL PROXY CLIENT GIZLER
+SERVER SIDE - REVERSE
+
+
+Apache - Nginx 
+
+Cloudflare -> Nginx -> HTTP/S Proxy !! Nginx başka protokol bilmez
+
+cloudflare - ip header - mail **
+crash at - mysql - user agent
+
+*****TCP - UDP******
+
+MTU -> Maximum Transfer Unit
+TTL -> Yaşama süresi , hata olursa ölecek (Süre bitince ICMP mesajı yollanır)
+
+ICMP HEADER
+TTL -> TIME TO LIVE
+TCP vs UDP -> iletim doğrulama / kontrol
+
+
+
+ICMP MAN IN THE MIDDLE
+
+ICMP REDIRECT
+IPTABLES -T NAT -A POSTROUTING
+
+
+SSL
+Hem şifre algoritması hemde hedef-sunucu doğrulaması mekanizması
+Sertifika dediğimiz anahtar yöntemiyle şifreleme söz konusu
+Ortak tek anahtar yapılıyorsa ele geçirilirse trafik açılabilir
+Çift taraflı - Public - Private key
+SSL(Encryption - authorization)
+
+A->Güvenilen SSL otoriteleri       Tanıtma<-B
+A->Hedefi Doğrulama  ->              (Hedef)B
+A Olup olmadığını kontrol edebilir
+VeriSign - E-Tuğra
+
+
+IP SPOOF
+TCP SYN SQ NUMBER PREDICTABLE (KEVIN MITNICK)
+
+ICMP REDIRECT MITM
+TCP FLOOD
+ARP SPOOF - MITM
+
+***** DHCP *****
+Çok büyük ağlarda statik zor olduğu için dinamik vermişler.
+DHCP DISCOVER
+DHCP OFFER
+DHCP REQUEST
+DHCP ACK
+
+
+DHCP RELEASE -> IP AL
+
+
+SIZMA TESİ NEDİR?
+KAPSAM VE İZİN DAHİLİNDE VERİLEN AĞIN VE AĞ İÇİNDEKİ MAKİNELERDE ZAFİYETLERİN
+TESPİT EDİLMESİ VE RAPORLANMASI (ŞİRKETLERE HACKER GÖZÜYLE BAKMAK)
+(RISK ASSESMENT)
+
+MOTIVASYON
+KIMI SİMÜLE ETMEYE ÇALIŞIYORUZ?
+
+*PARA
+*ZAMAN(DANISMAN VS HACKER -> DAHA GÜZEL )
+*EGO
+->ŞÖHRET
+->INTIKAM
+->TİCARİ ESPİYONAJ
+
+*KAPSAM
+
+BLACK HAT -> OPSEC
+
+
+BlackBox
+GreyBox
+WhiteBox
+
+
+->Internal Network
+->External Network
+
+
+IDOR
+-> userid=2
+-> userid=1
+
+CTF -> blackbox internal
+
+
+"Bussines survival depends on infosec"
+
+
+
+*Bilgi Toplama
+*Zafiyet Analizi / Tespiti
+*Zafiyet Sömürüsü
+*Post Exploitation
+-> Persistance
+-> Pivoting
+-> LPE (www-data(daemon)) -> root
+-> Log temizleme
+*Raporlama
+
+
+Rapor:
+Kapak -> Şirket logosu , tarih , Ref numarası , 
+	Notlar->Test tipi , kullanıcı bilgileri , kapsam 
+	Yönetici özeti->Gerizekalılara bilgi açıklamak , teknik detay yok,bulgular paylaşılmıştır
+	Teknik Detay->Tüm detaylar
+		İsmi         ->
+		Risk         ->
+		Açıklama     ->
+		Teknik Detay -> Nasıl bulundu , ekran görüntüleri
+		Önlem        ->
+		Referans     ->
+	Sonuç->Genel olarak siber güvenlik - işyeri
+
+
+Bilgi Toplama : Keypode -> Doğrudan Etkileşim Yok!
+	Hedef -> Ankara Üniversitesi
+			ankara.edu.tr
+
+	Pasif Bilgi Toplama (Blackbox)
+		whois -> TCP43 Protocol ("whois [DOMAIN]") Adres bilgisi ; E-posta ; Telefon Numaraları ; NS 
+			 	 Alan adının kayıtlı olduğu bilgiler
+		Network Scope
+			IPv4 Kaydı : 
+			("dig +short [DOMAIN]") ("nslookup [DOMAIN]") ("host [DOMAIN]") ("ping [DOMAIN]") ("whois -h whois.radb.net 'ASN'[IP]") '!gAS8678'
+			Mapping
+			   robtex.com
+			   bgp.he.net
+		Reverse Lookup
+			viewdns.info -> email - isim
+		Subdomain
+			Subdomain Nedir? : Kurumun sahip olduğu ana alan adına subdomain tanımlanıyor.
+			sub.domain.tld
+			dnsdumpster.com
+			pentesttools subdomain
+			Tools : fierce -dns [DOMAIN]
+				knock [DOMAIN] -> config.json -> virustotal api
+				sublist3r
+				subfinder
+				Virustotal : search : [DOMAIN] 
+				amass
+					VirtualHost:
+						Aynı IP üzerinde öteki domainler
+						Bing = ip:[IP] Bypass:Url ip sonrası sil (IIS) / Virustotal
+				crt.sh -> %.ankara.edu.tr
+				"google certificate transparency"
+				dig afrx @bilmemne bilmemne
+
+		Social Media
+			"nickname , username"
+			Facebook
+			Twitter
+			Youtube
+			"Linkedin"
+			pipl.com
+			github.io
+			gitlab.com
+			stackoverflow.com
+			instagram.com
+		Leaked Data
+			pastebin      -> raw data paylaşmak 
+			dehashed      ->  
+			ghost project ->
+			databases.today -> glogg
+			intelx.io
+		E-mail
+			Bruteforce
+			Phishing
+				-> ("theHarvester -d marmara.edu.tr -b all -l 200")
+				-> proxyduck 
+				-> yopmail.com (one time)
+				-> temp-mail.org
+				-> dumpedlqezarfife.onion
+		Jobs
+		Search Engine
+			Google = (site:*.ankara.edu.tr) , (-www.google.com) , (inurl:login) (intext:"index of") (robots.txt) (site:*.edu intext:"APP_ENV" ext:env 3306mysql)
+			Google = ( intitle:index of id_rsa -id_rsa.pub ) intext:"index of"
+			       =  site:*edu inurl:log intext:username 
+			       =  site:pastebin "@ankara.edu.tr"
+			CMD5   =  MD5 CRACK
+			GPUHASH.ME = 
+		Search Engine v2
+			Shodan -> net:[IP BLOK] "mongodb" "country:[ÜLKE KODU] 
+			Censys -> [DOMAIN]
+		Cloudflare Bypass
+			-> Subdomain
+			-> IP History -> securitytrails.com/dns-trails | rapid7 sonar | skytorrents
+	   		-> cPanel , reset pw
+			-> cloudresolve.net
+			-> crimeflare.org
+			-> Mail header
+			-> masscan -> tool
+			-> cloudfail
+		Archive
+			Geçmiş yıllardaki snapshot -> web.archive.org
+		Web Techs
+			wapplyzer | netcraft | whatruns
+		Metadata
+			Gömülü bilgi -> metagofil
+			Win: Foca Pro	
+	Aktif Bilgi Toplama
+		ALIVE SYSTEMS -> ARP -> " nmap -PR -sn 10.0.2.1/24 -vvv --open " "arp-scan --localnet "  "netdiscover -r 10.0.2.1/24"
+		(netstat -antp | grep listen)
+			NETCAT -> nc [IP] [PORT] <- bağlan nc -lvp [PORT] <- dinle | nc -lvp 1234 > /tmp/ww/gelen.txt | nc 127.0.0.1 < transfer.txt
+			PORT (2^16 BIT AYRILMIS , 65536) -> python -m SimpleHTTPServer 8989 | python3 http.server 8989 | scp username@1.1.1.1:/pwd
+			SERVIS
+			UDP
+			BANNER GRABBING
+		NMAP
+			DEFAULT -> Top 1000 ports , PORT , STATE , SERVICE -> 
+			TARGET -> 1.1.1.1 | 1.1.1.1/24
+			PORT - > -sS -> 
+			TCP SCAN TYPES -> -sS -> {HALF OPEN (SYN STEALTH) SCAN} { synproxy varsa -> "-sT" } {-sA }
+			OS DETECTION -> -O  , -sV
+			REPORTING -> -oA
+			FIREWALL BYPASS -> --spoof-mac= , --mtu , 
+			SCRIPT -> NSE -> LUA -> --script=ftp-anon.nse | --script nmap-vulners,vulscan --script-args vulscandb=scipvuldb.csv (git clone https://github.com/scipag/vulscan.git | git clone https://github.com/vulnersCom/nmap-vulners.git | cd /usr/share/nmap/scripts/ )
+		FUZZING
+			dirb -> directory buster
+			dirbuster -> medium
+			dirsearch
+			gobuster
+			nikto --host <URL>	
+		ScreenShot
+			Canlı makinelerin http servislerine tarama at , ayrıca listele 
+			eyewitness -> python
+			gowitness ->  go
+
+Virtual Enviroment
+->Python . Neden ? Dependency Tree -> 		
+
+Exploit -> Payload
+Risk : Bilginin değeri
+0day ->  1day
+
+
+		VulnScan
+			Netsparker  <->  Nessus      <-> Attack Flow
+			Acunetix    <->  OpenVAS     <-> RIPS
+			Burp Pro    <->  Nexpose     <-> Checkmarx
+			OWASP ZAP   <->  Core Impact <->
+		Manuel Vuln Scan
+			Service Enumeration
+				cvedetails.com
+				Security Focus
+				vulndb.com
+				exploit-db
+		Interaktif Shell
+		python -c 'import pty;pty.spawn("/bin/bash");'
+		Shell Kavramı 
+		Web Shell
+		Bind Shell
+		Reverse Shell
+		
+	Metasploit Framework = Ruby
+		msfconsole
+		msfvenom 
+	Post-Exploitation
+		Linux = root (0)
+		Windows = NT AUTHORITY / SYSTEM (500)
+			|
+			|-> DOMAIN ADMIN
+		Lateral Movement (Local)
+		Lateral Movement (PC2PC)
+			Juicy Files
+		LPE -> Cronjob = /etc/crontab | cd cron.hourly | cd cron.d | take -u | cron -l
+			-> pentestmonkey reverse shell cheat sheet
+			-> Kernel vulns -> lsb_release -a | uname -a | -> getpid -> ps -> migrate -> getsystem -> /pos/multi/recon/local_exploit_suggester -> set session -> UAC access control -> 
+				-> Incognito -> use incognito - list_tokens -u  "impersonate_token ACME\\DENEME "
+				
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
